@@ -4,7 +4,11 @@ import Link from "next/link";
 import { api } from "~/utils/api";
 
 export default function Home() {
-  const { data: sessionData } = useSession();
+  const { data: sessionData, status } = useSession();
+
+  if (status === "loading") {
+    return <p>Loading...</p>
+  }
 
   return (
     <>

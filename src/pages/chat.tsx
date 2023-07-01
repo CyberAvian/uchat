@@ -6,28 +6,28 @@ import type { ChangeEvent, KeyboardEvent } from "react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 
 export default function Chat() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [text, setText] = useState("");
   const [userInput, setUserInput] = useState("");
   const [username, setUsername] = useState("");
   const [messages, setMessages] = useState<
-    { id: number; user: string; text: string }[]
+    { id: number; user: string; text: string, time: string }[]
   >([
-    { id: 0, user: "cyberavian", text: "hello" },
-    { id: 1, user: "cyberavian", text: "welcome to the world" },
-    { id: 2, user: "cyberavian", text: "test" },
-    { id: 3, user: "cyberavian", text: "test" },
-    { id: 4, user: "cyberavian", text: "test" },
-    { id: 5, user: "cyberavian", text: "test" },
-    { id: 6, user: "cyberavian", text: "test" },
-    { id: 7, user: "cyberavian", text: "test" },
-    { id: 8, user: "cyberavian", text: "test" },
-    { id: 9, user: "cyberavian", text: "test" },
-    { id: 10, user: "cyberavian", text: "test" },
-    { id: 11, user: "cyberavian", text: "test" },
-    { id: 12, user: "cyberavian", text: "test" },
-    { id: 13, user: "cyberavian", text: "test" },
-    { id: 14, user: "cyberavian", text: "test" },
+    { id: 0, user: "cyberavian", text: "hello", time: "06/30/2023, 10:00:00 PM" },
+    { id: 1, user: "cyberavian", text: "welcome to the world", time: "06/30/2023, 10:00:00 PM" },
+    { id: 2, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
+    { id: 3, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
+    { id: 4, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
+    { id: 5, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
+    { id: 6, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
+    { id: 7, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
+    { id: 8, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
+    { id: 9, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
+    { id: 10, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
+    { id: 11, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
+    { id: 12, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
+    { id: 13, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
+    { id: 14, user: "cyberavian", text: "test", time: "06/30/2023, 10:00:00 PM" },
   ]);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const messageAreaRef = useRef<HTMLUListElement>(null);
@@ -49,6 +49,7 @@ export default function Chat() {
   useEffect(() => {
     if (messageAreaRef.current) {
       messageAreaRef.current.scrollTop = messageAreaRef.current.scrollHeight;
+      console.log("Top, Height: ", messageAreaRef.current.scrollTop, ", ", messageAreaRef.current.scrollHeight)
     }
   }, [messages]);
 
@@ -83,12 +84,12 @@ export default function Chat() {
     console.log(text);
     const currentMessages = [...messages];
     const messageNum = currentMessages.length;
-    currentMessages.push({ id: messageNum, user: "cyberavian", text: text });
+    currentMessages.push({ id: messageNum, user: username, text: text, time: new Date().toLocaleString() });
     setMessages(currentMessages);
     setText("");
   };
 
-  if (!session && !username) {
+  if (status === "unauthenticated" && !username) {
     return (
       <div className="flex min-h-screen w-screen flex-col items-center justify-center gap-5 bg-white bg-gradient-to-b pt-20 dark:from-slate-800 dark:to-slate-950 dark:text-white">
         <h1 className="text-5xl font-extrabold text-pink-400">Access Denied</h1>
@@ -134,45 +135,61 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex max-h-screen min-h-screen w-screen bg-white bg-gradient-to-b pt-16 dark:from-slate-800 dark:to-slate-950 dark:text-white">
-      <div className="flex w-full flex-col">
-        <div className="h-[5%] w-full justify-self-start text-center">
-          <h1 className="p-2 text-xl">Chatroom as {username}</h1>
+    <main className="flex max-h-screen min-h-screen w-screen bg-white dark:bg-slate-950 dark:text-white">
+      <div className="min-h-full w-[13%] bg-white dark:bg-slate-900/30">
+        <div>
+          <p>Address Book</p>
         </div>
-        <div className="mt-auto flex h-[85%] flex-col items-end px-2 py-2">
-          <ul
-            className="flex flex-col items-end gap-2 overflow-scroll"
-            ref={messageAreaRef}
-          >
-            {messages.map((message) => {
-              return (
-                <div
-                  key={message.id}
-                  className="rounded-l-3xl rounded-r-lg border px-2 py-1 text-center whitespace-pre-wrap dark:border-pink-800 dark:bg-pink-700"
-                >
-                  {message.text}
-                </div>
-              );
-            })}
-          </ul>
-        </div>
-        <div className="mt-auto flex w-full items-center gap-2 justify-self-end px-2 py-2">
-          <textarea
-            id="message"
-            value={text}
-            rows={1}
-            onChange={(e) => handleChange(e)}
-            onKeyDown={(e) => handleKeydown(e)}
-            placeholder="Type here..."
-            ref={textAreaRef}
-            className="max-h-36 w-full resize-none overflow-hidden rounded-full bg-white/10 px-4 py-2 text-black outline-none dark:text-white"
-          />
-          <div onClick={handleSubmit} className="flex items-center">
-            <PaperAirplaneIcon className="h-6 w-6" />
+      </div>
+      <div className="flex min-h-full w-[87%] dark:bg-slate-900/40">
+        <div className="flex min-h-full w-full flex-col">
+          <div className="flex w-full justify-self-start items-center border-b border-b-slate-950">
+            <h1 className="p-4 text-xl">{username}</h1>
+          </div>
+          <div className="mt-auto flex flex-grow flex-shrink overflow-scroll flex-col justify-end px-2 py-2">
+            <ul
+              className="flex flex-col w-full items-end overflow-scroll"
+              ref={messageAreaRef}
+            >
+              {messages.map((message, index) => {
+                return (
+                  index === 0 || messages[index - 1]?.user !== message.user ? (
+                    <div
+                      key={message.id}
+                      className="w-full whitespace-pre-wrap dark:hover:bg-slate-950 mt-3"
+                    >
+                      <p>{message.user} <span className="text-xs text-white/50">{message.time}</span></p>
+                      <p>{message.text}</p>
+                    </div>
+                  ) : (
+                    <div
+                      key={message.id}
+                      className="w-full whitespace-pre-wrap dark:hover:bg-slate-950"
+                    >
+                      <p>{message.text}</p>
+                    </div>
+                  ))
+              })}
+            </ul>
+          </div>
+          <div className="mt-auto flex w-full items-end gap-2 justify-self-end px-2 py-2">
+            <textarea
+              id="message"
+              value={text}
+              rows={1}
+              onChange={(e) => handleChange(e)}
+              onKeyDown={(e) => handleKeydown(e)}
+              placeholder="Type here..."
+              ref={textAreaRef}
+              className="w-full max-h-56 resize-none rounded-full bg-white/10 px-4 py-2 text-black outline-none dark:text-white"
+            />
+            <div onClick={handleSubmit} className="flex self-center">
+              <PaperAirplaneIcon className="h-6 w-6" />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
